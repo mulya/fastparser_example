@@ -5,15 +5,25 @@ object ParserTask extends App {
 
   val lines = Source.fromResource("table.txt").getLines().mkString("\n")
 
-  def elementRow[_: P] = P(CharIn("0-9","A-Z",".","\\-",":"," ","(",")","%","+","#","a-z","/").rep(1).!)
+  def element[_: P] = P(CharIn("0-9","A-Z",".","\\-",":"," ","(",")","%","+","#","a-z","/").rep(1))
   def endline[_: P] = P("\n")
-  def tableRow[_: P] = P((elementRow ~ "\t".?).rep ~ endline).map(list => if (list.length == 9) list)
-  def table[_: P] = P(tableRow.rep(1))
+
+  def garbageLine[_: P] = P(element ~ endline)
+  def header[_: P] = P(Start ~ garbageLine.rep)
+  def footer[_: P] = P(garbageLine.rep ~ element ~ End)
+
+  def line[_: P] = P((element ~ "\t").!.rep(1) ~ element ~ endline.?).!
+  def splitedLine[_: P] =
+    P(line.map(x => x.replaceAll("(\r\n)|\r|\n", "")
+    .split("\t")
+    .toList))
+  def table[_: P] =
+    P(header.? ~ splitedLine.rep ~ footer.?)
 
   parse(lines, table(_)) match {
     case Parsed.Success(value, successIndex) =>
       println("Success value=" + value + " successIndex=" + successIndex)
-    case f @ Parsed.Failure(label, index, extra) =>
+    case f @ Parsed.Failure(_) =>
       println("Failure " + f.trace(true))
   }
 }
