@@ -1,10 +1,9 @@
-import ParserTask.table
+import ParserFirstTask.table
 import fastparse.{Parsed, parse}
-import org.scalatest.matchers.should._
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 
-class ParserTaskTest extends AsyncWordSpec with Matchers {
+class ParserFirstTaskTest extends AsyncWordSpec with Matchers {
 
   def getParse(text: String): Seq[Seq[String]] = parse(text, table(_)) match {
     case Parsed.Success(value, _) => value

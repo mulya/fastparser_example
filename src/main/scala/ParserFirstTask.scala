@@ -1,6 +1,6 @@
 import scala.io.Source
 
-object ParserTask extends App {
+object ParserFirstTask extends App {
   import fastparse._, NoWhitespace._
 
   val lines = Source.fromResource("table.txt").getLines().mkString("\n")
